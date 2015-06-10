@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.0
+ * fullcalendar-columns v1.1
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -13,18 +13,7 @@
 		initialize: function() {
 			this.numColumns = this.opt('numColumns');
 			AgendaView.prototype.initialize.call(this);
-			var origHeadCellHtml = this.timeGrid.headCellHtml;
-			var that = this;
-			if (! this.timeGrid.headCellHtml)
-				throw "This version of fullcalendar-columns doesn't seem to " +
-					"be compatible with your FullCalendar version.";
-			this.timeGrid.headCellHtml = function(cell) {
-				/* Only render one header, with colspan=numColumns: */
-				if (cell.col % that.numColumns)
-					return '';
-				var html = origHeadCellHtml.apply(this, arguments);
-				return $(html).attr('colSpan', that.numColumns)[0].outerHTML;
-			};
+			this._monkeyPatchGridRendering();
 		},
 		renderEvents: function(events) {
 			this.originalEvents = {};
@@ -110,6 +99,22 @@
 			}
 			this.isHiddenDayHash = isHiddenDayHashBefore;
 			return date;
+		},
+		_monkeyPatchGridRendering: function() {
+			var that = this;
+			var origHeadCellHtml = this.timeGrid.headCellHtml;
+			this.timeGrid.headCellHtml = function(cell) {
+				/* Only render one header, with colspan=numColumns: */
+				if (cell.col % that.numColumns)
+					return '';
+				var html = origHeadCellHtml.apply(this, arguments);
+				return $(html).attr('colSpan', that.numColumns)[0].outerHTML;
+			};
+			var origGetDayClasses = this.timeGrid.getDayClasses;
+			this.timeGrid.getDayClasses = function(date) {
+				var dateCol = that._computeOriginalEvent({ start: date });
+				return origGetDayClasses.call(this, dateCol.start);
+			};
 		},
 		_computeFakeEvent: function (event) {
 			var start = this.calendar.moment(event.start);
