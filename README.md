@@ -1,5 +1,5 @@
 # fullcalendar-columns
-A FullCalendar extension that adds support for multiple columns (/resources) per day. Can currently only display multiple columns for a single day. Per-column labels are not supported. Tested with FullCalendar v2.3.1, but likely to be compatible with other versions.
+A FullCalendar extension that adds support for multiple columns (/resources) per day. Per-column labels are not supported. Tested with FullCalendar v2.3.1, but likely to be compatible with other versions.
 
 ## Live demo
 

@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.1
+ * fullcalendar-columns v1.2
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -55,50 +55,13 @@
 			);
 		},
 		computeRange: function(date) {
-			var result =
-				AgendaView.prototype.computeRange.apply(this, arguments);
-			result.intervalEnd = result.intervalStart.clone().add(1, 'day');
+			var result = AgendaView.prototype.computeRange.call(this, date);
+			var daysAvailable =
+				this._countNonHiddenDaysBetween(result.start, result.end);
+			var daysRequired = daysAvailable * this.numColumns;
+			result.end =
+				this._addNonHiddenDays(result.start.clone(), daysRequired);
 			return result;
-		},
-		initHiddenDays: function() {
-			// We don't want any hidden days such as weekends because it would
-			// screw up the display of "border days". For example: With 2
-			// columns, a Friday is displayed as two "fake" days: Friday and
-			// Saturday, where Saturday corresponds to the second column of
-			// Friday. If Saturday were hidden, this would not work.
-			this.isHiddenDayHash =
-				[false, false, false, false, false, false, false];
-		},
-		computeNextDate: function(date) {
-			// Each day is represented by numColumns "fake" days. Pressing next
-			// would therefore normally cause FullCalendar to jump numColumns
-			// days into the future. However, we only want it to jump 1 (real)
-			// day:
-			return this.massageCurrentDate(
-				date.clone().startOf(this.intervalUnit).add(1, 'day')
-			);
-		},
-		computePrevDate: function(date) {
-			// Similarly to computeNextDate(date).
-			return this.massageCurrentDate(
-				date.clone().startOf(this.intervalUnit).subtract(1, 'day'), -1
-			);
-		},
-		massageCurrentDate: function(date, direction) {
-			// FullCalendar uses this method to skip over hidden days. We do
-			// want this to work when paginating forward, to skip over weekends.
-			// However, since initHiddenDays() above sets the hidden days to [],
-			// no skipping would take place. We thus temporarily set the hidden
-			// days back to what FullCalendar would normally set them to be, to
-			// be able to mimic the original calculation.
-			var isHiddenDayHashBefore = this.isHiddenDayHash;
-			AgendaView.prototype.initHiddenDays.call(this);
-			if (this.isHiddenDay(date)) {
-				date = this.skipHiddenDays(date, direction);
-				date.startOf('day');
-			}
-			this.isHiddenDayHash = isHiddenDayHashBefore;
-			return date;
 		},
 		_monkeyPatchGridRendering: function() {
 			var that = this;
@@ -107,7 +70,8 @@
 				/* Only render one header, with colspan=numColumns: */
 				if (cell.col % that.numColumns)
 					return '';
-				var html = origHeadCellHtml.apply(this, arguments);
+				var cellOrig = that._computeOriginalEvent(cell);
+				var html = origHeadCellHtml.call(this, cellOrig);
 				return $(html).attr('colSpan', that.numColumns)[0].outerHTML;
 			};
 			var origGetDayClasses = this.timeGrid.getDayClasses;
@@ -116,32 +80,54 @@
 				return origGetDayClasses.call(this, dateCol.start);
 			};
 		},
-		_computeFakeEvent: function (event) {
+		_computeFakeEvent: function(event) {
+			var result = $.extend({}, event);
 			var start = this.calendar.moment(event.start);
 			if (start >= this.start) {
 				var daysDelta =
 					moment.duration(event.start - this.start).days();
 				var fakeDayOffset = daysDelta * this.numColumns + event.column;
-				var fakeDelta = moment.duration(fakeDayOffset, 'days');
-				return $.extend({}, event, {
-					start: start.add(fakeDelta),
-					end: this.calendar.moment(event.end).add(fakeDelta)
-				});
+				result.start = this._addNonHiddenDays(
+					start.subtract(daysDelta, 'days'), fakeDayOffset
+				);
+				if ('end' in event) {
+					var end = this.calendar.moment(event.end);
+					result.end = this._addNonHiddenDays(
+						end.subtract(daysDelta, 'days'), fakeDayOffset
+					);
+				}
 			}
-			return event;
+			return result;
+		},
+		_addNonHiddenDays: function(date, deltaDays) {
+			var result = this.calendar.moment(date);
+			for (var i=0; i < deltaDays; i++)
+				result = this.skipHiddenDays(result.add(1, 'day'));
+			return result;
+		},
+		_countNonHiddenDaysBetween: function(date1, date2) {
+			for (var result=0; date1.isBefore(date2, 'day'); result++)
+				date1 = this._addNonHiddenDays(date1, 1);
+			return result;
 		},
 		_computeOriginalEvent: function(event) {
 			var result = $.extend({}, event);
 			var start = this.calendar.moment(event.start);
 			if (start >= this.start) {
-				var fakeDayOffset = moment.duration(start - this.start).days();
+				var fakeDayOffset =
+					this._countNonHiddenDaysBetween(this.start, start);
 				result.column = fakeDayOffset % this.numColumns;
-				var daysDelta =
-					fakeDayOffset - Math.floor(fakeDayOffset / this.numColumns);
-				result.start = start.subtract(daysDelta, 'days');
-				if ('end' in result)
-					result.end = this.calendar
-						.moment(result.end).subtract(daysDelta, 'days');
+				var daysDelta = moment.duration(start - this.start).days();
+				var days = Math.floor(fakeDayOffset / this.numColumns);
+				result.start = this._addNonHiddenDays(
+					start.subtract(daysDelta, 'days'), days
+				);
+				if ('end' in event) {
+					var end = this.calendar.moment(event.end);
+					result.end = this._addNonHiddenDays(
+						end.subtract(daysDelta, 'days'), days
+					);
+				}
 			}
 			return result;
 		},
