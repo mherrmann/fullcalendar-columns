@@ -3,7 +3,7 @@ A FullCalendar extension that adds support for multiple columns (/resources) per
 
 ## Live demo
 
-https://jsfiddle.net/exa7eusq/2
+http://jsfiddle.net/jkmda709/2/
 
 ## Usage
 
@@ -12,15 +12,14 @@ Include after `fullcalendar.js`:
     <script type="text/javascript" src="fullcalendar.js">
     <script type="text/javascript" src="fullcalendar-columns.js">
 
-In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Its `duration` *must* be set to the number of columns you wish to have. You also need to set the `numColumns` parameter to the same value:
+In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Set `numColumns` to the number of columns you want displayed:
 
-    var NUM_COLUMNS = 2;
     $("#calendar").fullCalendar({
         views: {
             multiColAgendaDay: {
                 type: 'multiColAgenda',
-                duration: { days: NUM_COLUMNS },
-                numColumns: NUM_COLUMNS,
+                duration: { days: 1 },
+                numColumns: 2
             }
         },
         defaultView: 'multiColAgendaDay'
@@ -41,7 +40,7 @@ This defines an event in the second column of the current day.
 Unlike other similar solutions, this is *not* a fork of FullCalendar. This has the advantage that you can use it with newer versions of FullCalendar, and do not have to depend on a probably unmaintained clone.
 
 ## Caveats
-The implementation works by tricking FullCalendar into displaying columns as separate days. For example: A Friday with two columns is rendered behind the scenes by asking FullCalendar to draw two days, Friday and Saturday, where Saturday corresponds to Friday's second column. Care is taken to make this trick transparent to the user (you), but in some cases this is not 100% possible. For example, some [View Object](http://fullcalendar.io/docs/views/View_Object) properties such as `end` do not contain the "correct" value. Another example is the fact that in the `options` parameter, when you specify the view, you have to set the `duration` to the number of columns.
+The implementation works by tricking FullCalendar into displaying columns as separate days. For example: A Friday with two columns is rendered behind the scenes by asking FullCalendar to draw two days, Friday and the coming Monday, where Monday corresponds to Friday's second column. Care is taken to make this trick transparent to the user (you), but in some cases this is not 100% possible. For example, some [View Object](http://fullcalendar.io/docs/views/View_Object) properties such as `end` do not contain the "correct" value.
 
 ## Maintenance
 This repository captures the state of code which I use in production and currently does not include features which I do not need. However, I am open to feature or pull requests.
