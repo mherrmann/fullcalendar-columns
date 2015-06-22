@@ -59,20 +59,40 @@
 			var daysAvailable =
 				this._countNonHiddenDaysBetween(result.start, result.end);
 			var daysRequired = daysAvailable * this.numColumns;
-			result.end =
-				this._addNonHiddenDays(result.start.clone(), daysRequired);
+			result.end = this._addNonHiddenDays(result.start, daysRequired);
 			return result;
 		},
 		_monkeyPatchGridRendering: function() {
 			var that = this;
 			var origHeadCellHtml = this.timeGrid.headCellHtml;
 			this.timeGrid.headCellHtml = function(cell) {
-				/* Only render one header, with colspan=numColumns: */
-				if (cell.col % that.numColumns)
-					return '';
+				/*
+				 * Make multiple day header cells (each for one column) appear
+				 * as one. The easiest way to do this would be to just render
+				 * a single header cell with colspan=this.numColumns. However,
+				 * this leads to misalignment between the day header cells and
+				 * the events table. To get around this, we do render the same
+				 * number of <th> cells as FullCalendar, but only fill the first
+				 * one:
+				 */
 				var cellOrig = that._computeOriginalEvent(cell);
-				var html = origHeadCellHtml.call(this, cellOrig);
-				return $(html).attr('colSpan', that.numColumns)[0].outerHTML;
+				var $html = $(origHeadCellHtml.call(this, cellOrig));
+				var isFirstCellForDay = cellOrig.column == 0;
+				var isLastCellForDay = cellOrig.column == that.numColumns - 1;
+				if (isFirstCellForDay) {
+					// Make the cell appear centered:
+					var posPercent = 50 * (that.numColumns - 1);
+					$html.html(
+						'<div style="position: relative; left: '
+						+ posPercent + '%;">' + $html.html() + '</div>'
+					);
+				} else {
+					$html.css('border-left-width', 0);
+					$html.html('');
+				}
+				if (! isLastCellForDay)
+					$html.css('border-right-width', 0);
+				return $html[0].outerHTML;
 			};
 			var origGetDayClasses = this.timeGrid.getDayClasses;
 			this.timeGrid.getDayClasses = function(date) {
