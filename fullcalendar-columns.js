@@ -1,12 +1,12 @@
 /*!
- * fullcalendar-columns v1.2
+ * fullcalendar-columns v1.3
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
 
 (function($, moment) {
 	var fc = $.fullCalendar;
-	var AgendaView = fc.views.agenda;
+	var AgendaView = fc.views.agenda.class || fc.views.agenda;
 	fc.views.multiColAgenda = AgendaView.extend({
 		originalEvents: null,
 		fakeEvents: null,
