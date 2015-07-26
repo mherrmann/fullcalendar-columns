@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.3
+ * fullcalendar-columns v1.4
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -30,7 +30,8 @@
 		trigger: function(name, thisObj) {
 			var args = Array.prototype.slice.call(arguments);
 			if (name == 'eventRender' || name == 'eventAfterRender'
-				|| name == 'eventDestroy' || name == 'eventClick')
+				|| name == 'eventDestroy' || name == 'eventClick'
+				|| name == 'eventMouseover' || name == 'eventMouseout')
 				args[2] = this.originalEvents[args[2]._id];
 			else if (name == 'dayClick' || name == 'dayRightclick') {
 				var date = this._computeOriginalEvent({ start: args[2] });
