@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.4
+ * fullcalendar-columns v1.5
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -138,7 +138,7 @@
 				var fakeDayOffset =
 					this._countNonHiddenDaysBetween(this.start, start);
 				result.column = fakeDayOffset % this.numColumns;
-				var daysDelta = moment.duration(start - this.start).days();
+				var daysDelta = start.diff(this.start, 'days');
 				var days = Math.floor(fakeDayOffset / this.numColumns);
 				result.start = this._addNonHiddenDays(
 					start.subtract(daysDelta, 'days'), days
