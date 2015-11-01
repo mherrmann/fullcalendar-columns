@@ -1,0 +1,18 @@
+{
+  "name": "fullcalendar-columns",
+  "version": "1.5",
+  "description": "A FullCalendar extension that adds support for multiple columns (resources) per day.",
+  "author": "Michael Herrmann",
+  "license": "MIT",
+  "homepage": "https://github.com/mherrmann/fullcalendar-columns",
+  "main": "fullclendar-columns.js",
+  "ignore": [
+    ".*",
+    "Gemfile",
+    "Gemfile.lock",
+    "*.md"
+  ],
+  "dependencies": {
+    "fullcalendar": "~2.3.1"
+  }
+}
