@@ -1,5 +1,5 @@
 # fullcalendar-columns
-A FullCalendar extension that adds support for multiple columns (/resources) per day. Per-column labels are not supported. Tested with FullCalendar v2.3.1, but likely to be compatible with other versions.
+A FullCalendar extension that adds support for multiple columns (/resources) per day. Tested with FullCalendar v2.3.1, but likely to be compatible with other versions.
 
 ## Live demo
 
@@ -12,14 +12,15 @@ Include after `fullcalendar.js`:
     <script type="text/javascript" src="fullcalendar.js">
     <script type="text/javascript" src="fullcalendar-columns.js">
 
-In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Set `numColumns` to the number of columns you want displayed:
+In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Set `numColumns` to the number of columns you want displayed. You can optionally specify the `columnHeaders` parameter if you want a label to be displayed at the top of each column:
 
     $("#calendar").fullCalendar({
         views: {
             multiColAgendaDay: {
                 type: 'multiColAgenda',
                 duration: { days: 1 },
-                numColumns: 2
+                numColumns: 2,
+                columnHeaders: ['First column', 'Second column']
             }
         },
         defaultView: 'multiColAgendaDay'

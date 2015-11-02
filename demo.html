@@ -21,17 +21,18 @@
 				multiColAgendaDay: {
 					type: 'multiColAgenda',
 					duration: { days: 1 },
-					numColumns: 8
+					numColumns: 2,
+					columnHeaders: ['First Column', 'Second Column']
 				},
 				multiColAgendaWeek: {
 					type: 'multiColAgenda',
 					duration: { weeks: 1 },
-					numColumns: 8
+					numColumns: 2,
+					columnHeaders: ['First', 'Second']
 				}
 			},
 			allDaySlot: false,
-			//weekends: false,
-			defaultView: 'multiColAgendaWeek',
+			defaultView: 'multiColAgendaDay',
 			defaultDate: '2015-02-12',
 			editable: true,
 			events: [

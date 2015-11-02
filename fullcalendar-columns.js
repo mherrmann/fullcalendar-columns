@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.5
+ * fullcalendar-columns v1.6
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -12,6 +12,7 @@
 		fakeEvents: null,
 		initialize: function() {
 			this.numColumns = this.opt('numColumns');
+			this.columnHeaders = this.opt('columnHeaders');
 			AgendaView.prototype.initialize.call(this);
 			this._monkeyPatchGridRendering();
 		},
@@ -80,19 +81,28 @@
 				var $html = $(origHeadCellHtml.call(this, cellOrig));
 				var isFirstCellForDay = cellOrig.column == 0;
 				var isLastCellForDay = cellOrig.column == that.numColumns - 1;
+
+				var html = '';
 				if (isFirstCellForDay) {
 					// Make the cell appear centered:
-					var posPercent = 50 * (that.numColumns - 1);
-					$html.html(
-						'<div style="position: relative; left: '
-						+ posPercent + '%;">' + $html.html() + '</div>'
-					);
+					var posPercent = 100 * that.numColumns;
+					html = '<div style="position: relative; width: '
+					       + posPercent + '%;text-align:center;">'
+					       + $html.html() + '</div>';
 				} else {
+					html = '<div>&nbsp;</div>';
 					$html.css('border-left-width', 0);
-					$html.html('');
 				}
 				if (! isLastCellForDay)
 					$html.css('border-right-width', 0);
+				if (that.columnHeaders) {
+					// Use the prefix 'fce-col-' (as in "FullCalendar
+					// extension") for classes pertaining only to
+					// fullcalendar-columns:
+					html += '<div class="fce-col-header">' +
+					        that.columnHeaders[cellOrig.column] + '</div>';
+				}
+				$html.html(html);
 				return $html[0].outerHTML;
 			};
 			var origGetDayClasses = this.timeGrid.getDayClasses;
