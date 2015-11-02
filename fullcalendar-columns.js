@@ -1,4 +1,4 @@
-/*!
+/*
  * fullcalendar-columns v1.5
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
@@ -11,7 +11,8 @@
 		originalEvents: null,
 		fakeEvents: null,
 		initialize: function() {
-			this.numColumns = this.opt('numColumns');
+			this.columns = this.opt('columns') || [{}];
+			this.numColumns = this.columns.length || 1;
 			AgendaView.prototype.initialize.call(this);
 			this._monkeyPatchGridRendering();
 		},
@@ -37,8 +38,15 @@
 				var date = this._computeOriginalEvent({ start: args[2] });
 				args[2] = date.start;
 				args[2].column = date.column;
+				args[2].columnData = date.columnData;
 			}
 			return AgendaView.prototype.trigger.apply(this, args);
+		},
+		reportSelection: function(range, ev) {
+			var event = this._computeOriginalEvent(range);
+
+			this.isSelected = true;
+			this.trigger('select', null, event.start, event.end, ev, event);
 		},
 		reportEventResize: function(event, location, largeUnit, el, ev) {
 			return this._reportEventReschedule(
@@ -57,8 +65,9 @@
 		},
 		computeRange: function(date) {
 			var result = AgendaView.prototype.computeRange.call(this, date);
-			var daysAvailable =
-				this._countNonHiddenDaysBetween(result.start, result.end);
+			result.endOrig = result.end.clone();
+
+			var daysAvailable = this._countNonHiddenDaysBetween(result.start, result.end);
 			var daysRequired = daysAvailable * this.numColumns;
 			result.end = this._addNonHiddenDays(result.start, daysRequired);
 			return result;
@@ -80,21 +89,33 @@
 				var $html = $(origHeadCellHtml.call(this, cellOrig));
 				var isFirstCellForDay = cellOrig.column == 0;
 				var isLastCellForDay = cellOrig.column == that.numColumns - 1;
+
+				var html = '';
 				if (isFirstCellForDay) {
 					// Make the cell appear centered:
-					var posPercent = 50 * (that.numColumns - 1);
-					$html.html(
-						'<div style="position: relative; left: '
-						+ posPercent + '%;">' + $html.html() + '</div>'
-					);
+					var posPercent = 100 * that.numColumns;
+					html  = '<div style="position: relative; width: '+ posPercent + '%;text-align:center;">' + $html.html() + '</div>';
 				} else {
+					html = '<div>&nbsp;</div>';
 					$html.css('border-left-width', 0);
-					$html.html('');
 				}
-				if (! isLastCellForDay)
+				if (! isLastCellForDay) {
 					$html.css('border-right-width', 0);
+				}
+
+				// add labels
+				if (cellOrig.columnData) {
+					html += '<div class="col-label col-label-' + cellOrig.columnData.id + '">' +
+						cellOrig.columnData.name +
+						'</div>';
+				}
+
+				// set updated html
+				$html.html(html);
+
 				return $html[0].outerHTML;
 			};
+
 			var origGetDayClasses = this.timeGrid.getDayClasses;
 			this.timeGrid.getDayClasses = function(date) {
 				var dateCol = that._computeOriginalEvent({ start: date });
@@ -105,8 +126,7 @@
 			var result = $.extend({}, event);
 			var start = this.calendar.moment(event.start);
 			if (start >= this.start) {
-				var daysDelta =
-					moment.duration(event.start - this.start).days();
+				var daysDelta = moment.duration(event.start - this.start).days();
 				var fakeDayOffset = daysDelta * this.numColumns + event.column;
 				result.start = this._addNonHiddenDays(
 					start.subtract(daysDelta, 'days'), fakeDayOffset
@@ -138,6 +158,7 @@
 				var fakeDayOffset =
 					this._countNonHiddenDaysBetween(this.start, start);
 				result.column = fakeDayOffset % this.numColumns;
+				result.columnData = this.columns[result.column];
 				var daysDelta = start.diff(this.start, 'days');
 				var days = Math.floor(fakeDayOffset / this.numColumns);
 				result.start = this._addNonHiddenDays(
@@ -165,11 +186,13 @@
 			var event = this.originalEvents[fakeEvent._id];
 			location = this._computeOriginalEvent(location);
 			event.column = location.column;
+			event.columnData = location.columnData;
 			return AgendaView.prototype[rescheduleType].call(
 				this, event, location, largeUnit, el, ev
 			);
 		}
 	});
+
 	var origFullCalendar = $.fn.fullCalendar;
 	$.fn.fullCalendar = function(options) {
 		if (options == 'updateEvent') { // Required by multiColAgenda

@@ -12,26 +12,30 @@ Include after `fullcalendar.js`:
     <script type="text/javascript" src="fullcalendar.js">
     <script type="text/javascript" src="fullcalendar-columns.js">
 
-In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Set `numColumns` to the number of columns you want displayed:
+In your FullCalendar `options` dictionary, define a view of type `multiColAgenda`. Set `columns` to the array of columns you want displayed (id and name are required):
 
     $("#calendar").fullCalendar({
         views: {
             multiColAgendaDay: {
                 type: 'multiColAgenda',
                 duration: { days: 1 },
-                numColumns: 2
+                columns: [
+                    { id: 1, name: 'First Column' },
+                    { id: 2, name: 'Second Column' }
+                ]
             }
         },
         defaultView: 'multiColAgendaDay'
     });
 
-From then on, each FullCalendar Event Object can have a `column` attribute, which specifies which column of a day the event belongs to. For example, using FullCalendar's `events` option:
+From then on, each FullCalendar Event Object can have a `column` attribute, which specifies which column of a day the event belongs to and its related columnData with the column object that you passed. For example, using FullCalendar's `events` option:
 
     events: [{
         title: 'Some event',
         start: moment(), // now
         end: moment().add(1, 'hour'), // in 1 hour
-        column: 1
+        column: 1,
+        columnData: { id: 2, name: 'Second Column' }
     }]
 
 This defines an event in the second column of the current day.
