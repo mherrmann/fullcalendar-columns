@@ -3,7 +3,7 @@ A FullCalendar extension that adds support for multiple columns (/resources) per
 
 ## Live demo
 
-http://jsfiddle.net/jkmda709/2/
+http://jsfiddle.net/jkmda709/25/
 
 ## Usage
 
