@@ -174,7 +174,6 @@
 			fakeEvent.end = location.end.clone();
 			var event = this.originalEvents[fakeEvent._id];
 			location = this._computeOriginalEvent(location);
-			event.column = location.column;
 			return AgendaView.prototype[rescheduleType].call(
 				this, event, location, largeUnit, el, ev
 			);
