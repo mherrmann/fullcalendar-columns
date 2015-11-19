@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.6
+ * fullcalendar-columns v1.7
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
