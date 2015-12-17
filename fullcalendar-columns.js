@@ -3,8 +3,15 @@
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
-
-(function($, moment) {
+(function(root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define([ 'jquery', 'moment' ], factory); // AMD
+	} else if (typeof exports === 'object') {
+		module.exports = factory(require('jquery'), require('moment')); // Node, CommonJS-like
+	} else {
+		root.returnExports = factory(jQuery, moment); // Browser globals (root is window)
+	}
+}(this, function($, moment) {
 	var fc = $.fullCalendar;
 	var AgendaView = fc.views.agenda.class || fc.views.agenda;
 	fc.views.multiColAgenda = AgendaView.extend({
@@ -188,4 +195,4 @@
 		}
 		return origFullCalendar.apply(this, arguments);
 	};
-})(jQuery, moment);
+}));
