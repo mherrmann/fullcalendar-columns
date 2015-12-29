@@ -4,13 +4,16 @@
  * (c) 2015 Michael Herrmann
  */
 (function(root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		define([ 'jquery', 'moment' ], factory); // AMD
-	} else if (typeof exports === 'object') {
-		module.exports = factory(require('jquery'), require('moment')); // Node, CommonJS-like
-	} else {
-		root.returnExports = factory(jQuery, moment); // Browser globals (root is window)
-	}
+	/**
+	 * Universal module definition following
+	 * http://davidbcalhoun.com/2014/what-is-amd-commonjs-and-umd:
+	 */
+	if (typeof define === 'function' && define.amd) // AMD
+		define([ 'jquery', 'moment' ], factory);
+	else if (typeof exports === 'object') // Node, CommonJS-like
+		module.exports = factory(require('jquery'), require('moment'));
+	else // Browser globals (root is window)
+		root.returnExports = factory(jQuery, moment);
 }(this, function($, moment) {
 	var fc = $.fullCalendar;
 	var AgendaView = fc.views.agenda.class || fc.views.agenda;
