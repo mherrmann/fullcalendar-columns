@@ -186,6 +186,9 @@
 			fakeEvent.start = location.start.clone();
 			fakeEvent.end = location.end.clone();
 			var event = this.originalEvents[fakeEvent._id];
+			if (event == null) {
+				return
+			}
 			location = this._computeOriginalEvent(location);
 			return AgendaView.prototype[rescheduleType].call(
 				this, event, location, largeUnit, el, ev
