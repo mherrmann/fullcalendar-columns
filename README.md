@@ -1,5 +1,5 @@
 # fullcalendar-columns
-A FullCalendar extension that adds support for multiple columns (/resources) per day. Tested with FullCalendar v2.3.1, but likely to be compatible with other versions.
+A FullCalendar extension that adds support for multiple columns (/resources) per day. Tested with FullCalendar v2.3.1 but *not compatible with FullCalendar >= 2.5*. It is recommended that for these higher versions you use the ["vertical resource view" of the official Scheduler plugin](http://fullcalendar.io/js/fullcalendar-scheduler-1.2.1/demos/vertical-resource-view.html).
 
 ## Live demo
 
