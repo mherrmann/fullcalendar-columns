@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.8
+ * fullcalendar-columns v1.9
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) 2015 Michael Herrmann
  */
@@ -63,15 +63,14 @@
 		},
 		reportExternalDrop: function(meta, dropLocation, el, ev, ui) {
 			var eventProps = meta.eventProps;
-			var eventInput;
 			var event;
 
 			dropLocation = this._computeOriginalEvent(dropLocation);
 			if (eventProps) {
-				eventInput = $.extend({}, eventProps, dropLocation);
-				event = this.calendar.renderEvent(eventInput, meta.stick)[0]; // renderEvent returns an array
+				var eventInput = $.extend({}, eventProps, dropLocation);
+				event = this.calendar.renderEvent(eventInput, meta.stick)[0];
 			}
-	
+
 			this._triggerExternalDrop(event, dropLocation, el, ev, ui);
 		},
 		updateEvent: function(event) {
@@ -196,22 +195,18 @@
 			fakeEvent.start = location.start.clone();
 			fakeEvent.end = location.end.clone();
 			var event = this.originalEvents[fakeEvent._id];
-			if (event == null) {
-				return
-			}
+			if (event == null)
+				return;
 			location = this._computeOriginalEvent(location);
 			return AgendaView.prototype[rescheduleType].call(
 				this, event, location, largeUnit, el, ev
 			);
 		},
-		// Triggers external-drop handlers that have subscribed via the API
 		_triggerExternalDrop: function(event, dropLocation, el, ev, ui) {
-			// trigger 'drop' regardless of whether element represents an event
+			// Trigger 'drop' regardless of whether element represents an event
 			this.trigger('drop', el[0], dropLocation.start, ev, ui);
-	
-			if (event) {
-				this.trigger('eventReceive', null, event); // signal an external event landed
-			}
+			if (event)
+				this.trigger('eventReceive', null, event);
 		}
 	});
 	var origFullCalendar = $.fn.fullCalendar;
