@@ -44,7 +44,7 @@
 				|| name == 'eventDestroy' || name == 'eventClick'
 				|| name == 'eventMouseover' || name == 'eventMouseout')
 				args[2] = this.originalEvents[args[2]._id];
-			else if (name == 'dayClick' || name == 'dayRightclick') {
+			else if (name == 'dayClick' || name == 'dayRightclick' || name == 'select') {
 				var date = this._computeOriginalEvent({ start: args[2] });
 				args[2] = date.start;
 				args[2].column = date.column;
