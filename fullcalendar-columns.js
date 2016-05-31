@@ -1,7 +1,7 @@
 /*!
- * fullcalendar-columns v1.9
+ * fullcalendar-columns v1.10
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
- * (c) 2015 Michael Herrmann
+ * (c) Michael Herrmann
  */
 (function(root, factory) {
 	/**
