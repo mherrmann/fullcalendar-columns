@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.10
+ * fullcalendar-columns v1.11
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) Michael Herrmann
  */
@@ -42,9 +42,13 @@
 			var args = Array.prototype.slice.call(arguments);
 			if (name == 'eventRender' || name == 'eventAfterRender'
 				|| name == 'eventDestroy' || name == 'eventClick'
-				|| name == 'eventMouseover' || name == 'eventMouseout')
+				|| name == 'eventMouseover' || name == 'eventMouseout'
+				|| name == 'eventRightclick')
 				args[2] = this.originalEvents[args[2]._id];
-			else if (name == 'dayClick' || name == 'dayRightclick' || name == 'select') {
+			else if (
+				name == 'dayClick' || name == 'dayRightclick'
+				|| name == 'select'
+			) {
 				var date = this._computeOriginalEvent({ start: args[2] });
 				args[2] = date.start;
 				args[2].column = date.column;
@@ -211,10 +215,30 @@
 	});
 	var origFullCalendar = $.fn.fullCalendar;
 	$.fn.fullCalendar = function(options) {
+		var view;
 		if (options == 'updateEvent') { // Required by multiColAgenda
-			var view = origFullCalendar.call(this, 'getView');
+			view = origFullCalendar.call(this, 'getView');
 			if (view.updateEvent)
 				view.updateEvent(arguments[1]);
+		} else if (options == 'clientEvents') {
+			view = origFullCalendar.call(this, 'getView');
+			if (view.calendar.clientEvents) {
+				var origEvents = $.map(view.calendar.clientEvents(),
+					function (fakeEvent) {
+						return view.originalEvents[fakeEvent._id];
+					}
+				);
+				// Mimic FC's clientEvents implementation:
+				if ($.isFunction(arguments[1]))
+					return $.grep(origEvents, arguments[1]);
+				if (arguments[1] != null) {
+					var filter = arguments[1] + '';
+					return $.grep(origEvents, function(e) {
+						return e._id == filter;
+					});
+				}
+				return origEvents;
+			}
 		}
 		return origFullCalendar.apply(this, arguments);
 	};
