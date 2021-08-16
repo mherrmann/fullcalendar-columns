@@ -37,6 +37,19 @@ From then on, each FullCalendar Event Object can have a `column` attribute, whic
 
 This defines an event in the second column of the current day.
 
+### Fixing the column
+
+When you start from the above approach with multiple columns, it may become necessary to display just a single (of the several available) columns. The typical use case for this is that every column belongs to one user. Administrators should see all columns. But each user should only see their own column.
+
+fullcalendar-columns supports this via the `fixedColumn` option. For example:
+
+    multiColAgendaDay: {
+        // ... settings as above...
+        // Only display one column, namely col. number 2:
+        numColumns: 1,
+        fixedColumn: 2
+    }
+
 ## Advantages
 Unlike other similar solutions, this is *not* a fork of FullCalendar. This has the advantage that you can use it with newer versions of FullCalendar, and do not have to depend on a probably unmaintained clone.
 

@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.11
+ * fullcalendar-columns v1.12
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) Michael Herrmann
  */
@@ -23,6 +23,7 @@
 		initialize: function() {
 			this.numColumns = this.opt('numColumns');
 			this.columnHeaders = this.opt('columnHeaders');
+			this.fixedColumn = this.opt('fixedColumn');
 			AgendaView.prototype.initialize.call(this);
 			this._monkeyPatchGridRendering();
 		},
@@ -105,16 +106,20 @@
 				 */
 				var cellOrig = that._computeOriginalEvent(cell);
 				var $html = $(origHeadCellHtml.call(this, cellOrig));
-				var isFirstCellForDay = cellOrig.column == 0;
-				var isLastCellForDay = cellOrig.column == that.numColumns - 1;
-
+				var isFirstCellForDay, isLastCellForDay;
+				if (that.numColumns === 1) {
+					isFirstCellForDay = isLastCellForDay = true;
+				} else {
+					isFirstCellForDay = cellOrig.column == 0;
+					isLastCellForDay = cellOrig.column == that.numColumns - 1;
+				}
 				var html = '';
 				if (isFirstCellForDay) {
 					// Make the cell appear centered:
 					var posPercent = 100 * that.numColumns;
 					html = '<div style="position: relative; width: '
-					       + posPercent + '%;text-align:center;">'
-					       + $html.html() + '</div>';
+						   + posPercent + '%;text-align:center;">'
+						   + $html.html() + '</div>';
 				} else {
 					html = '<div>&nbsp;</div>';
 					$html.css('border-left-width', 0);
@@ -126,7 +131,7 @@
 					// extension") for classes pertaining only to
 					// fullcalendar-columns:
 					html += '<div class="fce-col-header">' +
-					        that.columnHeaders[cellOrig.column] + '</div>';
+							that.columnHeaders[cellOrig.column] + '</div>';
 				}
 				$html.html(html);
 				return $html[0].outerHTML;
@@ -138,6 +143,8 @@
 			};
 		},
 		_computeFakeEvent: function(event) {
+			if (this.fixedColumn !== undefined)
+				return event;
 			var result = $.extend({}, event);
 			var start = this.calendar.moment(event.start);
 			if (start >= this.start) {
@@ -173,7 +180,10 @@
 			if (start >= this.start) {
 				var fakeDayOffset =
 					this._countNonHiddenDaysBetween(this.start, start);
-				result.column = fakeDayOffset % this.numColumns;
+				if (this.fixedColumn === undefined)
+					result.column = fakeDayOffset % this.numColumns;
+				else
+					result.column = this.fixedColumn;
 				var daysDelta = start.diff(this.start, 'days');
 				var days = Math.floor(fakeDayOffset / this.numColumns);
 				result.start = this._addNonHiddenDays(
