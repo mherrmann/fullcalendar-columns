@@ -1,5 +1,5 @@
 /*!
- * fullcalendar-columns v1.12
+ * fullcalendar-columns v1.13
  * Docs & License: https://github.com/mherrmann/fullcalendar-columns
  * (c) Michael Herrmann
  */
@@ -117,9 +117,9 @@
 				if (isFirstCellForDay) {
 					// Make the cell appear centered:
 					var posPercent = 100 * that.numColumns;
-					html = '<div style="position: relative; width: '
-						   + posPercent + '%;text-align:center;">'
-						   + $html.html() + '</div>';
+					html = '<div class="fce-cols-day-header" '
+					       + 'style="position: relative; width: ' + posPercent
+						   + '%;text-align:center;">' + $html.html() + '</div>';
 				} else {
 					html = '<div>&nbsp;</div>';
 					$html.css('border-left-width', 0);
@@ -130,8 +130,8 @@
 					// Use the prefix 'fce-col-' (as in "FullCalendar
 					// extension") for classes pertaining only to
 					// fullcalendar-columns:
-					html += '<div class="fce-col-header">' +
-							that.columnHeaders[cellOrig.column] + '</div>';
+					html += '<div class="fce-cols-col-header">' +
+					        that.columnHeaders[cellOrig.column] + '</div>';
 				}
 				$html.html(html);
 				return $html[0].outerHTML;
